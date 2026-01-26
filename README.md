@@ -18,6 +18,16 @@ Data Sources → Streaming → Data Lake → Data Warehouse → BI Dashboard
 - **Warehouse**: Amazon Redshift
 - **Visualization**: Tableau
 
+## Data Warehouse Design
+
+This project follows a **star schema** model:
+
+- **fact_sales**: Stores transactional data
+- **dim_users**: Stores user attributes
+- **dim_products**: Stores product metadata
+
+This enables efficient analytical queries and reporting.
+
 ---
 
 ## Phase 1: Data Source Simulation
