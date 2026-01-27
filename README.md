@@ -26,6 +26,18 @@ This project follows a **star schema** model:
 - **dim_users**: Stores user attributes
 - **dim_products**: Stores product metadata
 
+## 🔧 Local Setup Requirements
+
+To run this project locally:
+
+- Python 3.11+
+- Apache Kafka (running on localhost:9092)
+- Java 11 or above
+- Required Python packages:
+  pip install kafka-python
+
+Kafka is used as the streaming platform for ingesting sales events.
+
 This enables efficient analytical queries and reporting.
 
 ---
