@@ -1,70 +1,91 @@
-# Real-Time Data Engineering Pipeline on AWS
+# Real-Time Sales Analytics Pipeline (AWS + PySpark + Redshift)
 
-## Project Overview
-This project simulates a real-world data engineering pipeline for processing streaming social media activity and e-commerce transactions using a serverless cloud architecture.
+This project implements an end-to-end data engineering pipeline that ingests mock e-commerce data, transforms it using PySpark on AWS Glue, and loads it into Amazon Redshift for analytics and BI use cases.
 
-The pipeline demonstrates ingestion, transformation, storage, warehousing, and visualization of real-time data.
-
----
-
-## Architecture
-
-Data Sources → Streaming → Data Lake → Data Warehouse → BI Dashboard
-
-- **Data Sources**: Sales Generator (Python), Social Media API
-- **Streaming**: AWS Kinesis
-- **Processing**: AWS Lambda / Spark Streaming
-- **Storage**: Amazon S3 (Parquet)
-- **Warehouse**: Amazon Redshift
-- **Visualization**: Tableau
-
-## Data Warehouse Design
-
-This project follows a **star schema** model:
-
-- **fact_sales**: Stores transactional data
-- **dim_users**: Stores user attributes
-- **dim_products**: Stores product metadata
-
-## 🔧 Local Setup Requirements
-
-To run this project locally:
-
-- Python 3.11+
-- Apache Kafka (running on localhost:9092)
-- Java 11 or above
-- Required Python packages:
-  pip install kafka-python
-
-Kafka is used as the streaming platform for ingesting sales events.
-
-This enables efficient analytical queries and reporting.
+The pipeline is designed to be **cost-efficient**, **modular**, and **production-inspired**, while remaining simple enough for local testing and learning.
 
 ---
 
-## Phase 1: Data Source Simulation
+## Architecture Overview
 
-### Sales Data Generator
-A Python script that simulates real-time e-commerce transactions including:
-- Order ID
-- User ID
-- Product ID
-- Price
-- Quantity
-- Payment Type
-- Timestamp
+**Data Flow:**
 
-This simulates a production transaction system for streaming ingestion.
+Generators → Amazon S3 (RAW) → PySpark (AWS Glue) → Amazon S3 (CURATED) → Amazon Redshift → Analytics / BI
+
+**Storage Strategy:**
+- Small dimension tables (users, products): JSON → Redshift
+- Fact table (sales): JSON → Parquet → Redshift
 
 ---
 
 ## Tech Stack
-Python, AWS Kinesis, AWS Lambda, S3, Redshift, Tableau, Parquet, SQL
+
+- **Python** (data generators)
+- **Apache Spark (PySpark)** via AWS Glue
+- **Amazon S3** (raw + curated layers)
+- **Amazon Redshift (Provisioned / RA3)**
+- **IAM (role-based access)**
+- **SQL (analytics queries)**
 
 ---
 
-## Future Phases
-- Streaming ingestion with Kinesis
-- ETL processing and data lake storage
-- Redshift data warehouse
-- BI dashboard in Tableau
+## Project Structure
+.
+├── producers/
+│ ├── user_generator.py
+│ ├── product_generator.py
+│ └── sales_generator.py
+│
+├── spark_jobs/
+│ └── sales_json_to_parquet.py
+│
+├── docs/
+│ ├── aws-setup.md
+│ ├── run-manual.md
+│ └── config.md
+│
+└── README.md
+---
+
+## 📊 Data Model (Star Schema)
+
+### Dimension Tables
+- `dim_users`
+- `dim_products`
+
+### Fact Table
+- `fact_sales`
+
+---
+
+## 🧠 Key Design Decisions
+
+- **JSON used for dimensions** for schema flexibility and robust loading.
+- **Parquet used for facts** for analytical performance.
+- **No Spark partitioning** in curated data loaded into Redshift (schema alignment).
+- **Explicit schemas** enforced in Spark jobs.
+- **RAW data preserved** for replayability.
+
+---
+
+## Documentation
+
+- 👉 [`docs/aws-setup.md`](docs/aws-setup.md) — AWS setup & IAM
+- 👉 [`docs/run-manual.md`](docs/run-manual.md) — How to run the pipeline
+- 👉 [`docs/config.md`](docs/config.md) — Configuration & assumptions
+
+---
+
+## Future Improvements
+
+- Incremental fact loads
+- Data quality checks
+- Airflow orchestration
+- BI dashboards (Tableau)
+
+---
+
+## Author
+
+Built by **Aritra Lahiri** as a hands-on Data Engineering project focusing on real-world AWS + Spark challenges.
+
