@@ -1,27 +1,49 @@
 import json
 import random
+import boto3
+import os
 
-product_name = ["Laptop", "Smartphone", "Headphones", "Tablet", "Smartwatch",
-    "Camera", "Printer", "Monitor", "Keyboard", "Mouse"]
+BUCKET = "de-project-raw-sales-aritra"
+PREFIX = "products"
+REGION = "us-east-1"
 
-Categories = ["Electronics", "Accessories", "Computing", "Gadgets"]
+s3 = boto3.client(
+    "s3",
+    region_name=REGION,
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+)
 
-products = []
+product_names = [
+    "Laptop", "Smartphone", "Headphones", "Tablet",
+    "Smartwatch", "Camera", "Printer", "Monitor",
+    "Keyboard", "Mouse"
+]
+
+categories = ["Electronics", "Accessories", "Computing", "Gadgets"]
 
 product_id_start = 200
 num_products = 50
 
+products = []
+
 for i in range(num_products):
-    product = {
-        "product_id": product_id_start+1,
-        "product_name": random.choice(product_name)+f"Model-{i}",
-        "category": random.choice(Categories),
-        "current_price": round(random.uniform(500, 5000),2)
+    products.append({
+        "product_id": product_id_start + i,
+        "product_name": f"{random.choice(product_names)}-Model-{i}",
+        "category": random.choice(categories),
+        "current_price": round(random.uniform(500, 5000), 2)
+    })
 
-    }
-    product.append(product)
+print("📦 Uploading Products to S3...\n")
 
-    print("Generating Product Dimension Data.....\n")
+for product in products:
+    key = f"{PREFIX}/category={product['category']}/product_{product['product_id']}.json"
 
-    for p in products:
-        print(json.dumps(p))
+    s3.put_object(
+        Bucket=BUCKET,
+        Key=key,
+        Body=json.dumps(product)
+    )
+
+    print("Uploaded:", product)
